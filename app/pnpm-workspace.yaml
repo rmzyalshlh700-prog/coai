@@ -1,0 +1,9 @@
+# pnpm settings (pnpm >= 10 reads its configuration from this file)
+# Explicitly allow the two native build scripts required for the Vite/SWC build
+# (newer pnpm versions fail `pnpm install` with ERR_PNPM_IGNORED_BUILDS otherwise).
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+
+# Don't fail the whole install on future unreviewed build scripts; warn instead.
+strictDepBuilds: false
