@@ -27,6 +27,13 @@ func ReadConf() {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
+	// managed platforms (e.g. Render, Heroku, Fly.io) provide the listening
+	// port via the PORT environment variable, so honor it when present
+	if port := viper.GetString("port"); len(port) > 0 {
+		viper.Set("server.port", port)
+		globals.Debug(fmt.Sprintf("[service] listening port set from PORT environment variable: %s", port))
+	}
+
 	secret := viper.GetString("secret")
 	if len(secret) < 32 {
 		globals.Warn(fmt.Sprintf("[service] invalid secret length: got %d, expected at least 32 bytes; starting in 10 seconds, please set a stronger `secret` in config or environment; future versions may panic on weak secrets", len(secret)))

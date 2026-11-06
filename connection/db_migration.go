@@ -16,7 +16,14 @@ func validSqlError(err error) bool {
 	// Error 1060: Duplicate column name
 	// Error 1050: Table already exists
 
-	return !(strings.Contains(content, "Error 1060") || strings.Contains(content, "Error 1050"))
+	// sqlite equivalents of 1060 (duplicate column) and 1050 (table exists)
+	const sqliteDuplicateColumn = "duplicate column name"
+	const sqliteAlreadyExists = "already exists"
+
+	return !(strings.Contains(content, "Error 1060") ||
+		strings.Contains(content, "Error 1050") ||
+		strings.Contains(content, sqliteDuplicateColumn) ||
+		strings.Contains(content, sqliteAlreadyExists))
 }
 
 func checkSqlError(_ sql.Result, err error) error {

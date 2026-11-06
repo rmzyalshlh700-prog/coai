@@ -1,13 +1,15 @@
+# leave mysql.host empty to use the built-in sqlite database (~/db/chatnio.db)
 mysql:
   db: chatnio
-  host: localhost
+  host: ""
   password: chatnio123456
   port: 3306
   user: root
   tls: false
 
+# leave redis.host empty to fall back to the local default (localhost:6379)
 redis:
-  host: localhost
+  host: ""
   port: 6379
   db: 0
   password: ""

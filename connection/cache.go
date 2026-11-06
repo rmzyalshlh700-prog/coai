@@ -10,6 +10,9 @@ import (
 
 var Cache *redis.Client
 
+// redisWarned ensures the unreachable-redis warning is only logged once
+var redisWarned = false
+
 func InitRedisSafe() *redis.Client {
 	ConnectRedis()
 
@@ -27,13 +30,16 @@ func ConnectRedis() *redis.Client {
 	})
 
 	if err := pingRedis(Cache); err != nil {
-		globals.Warn(
-			fmt.Sprintf(
-				"[connection] failed to connect to redis host: %s (message: %s), will retry in 5 seconds",
-				viper.GetString("redis.host"),
-				err.Error(),
-			),
-		)
+		if !redisWarned {
+			globals.Warn(
+				fmt.Sprintf(
+					"[connection] failed to connect to redis host: %s (message: %s), will retry in 5 seconds",
+					viper.GetString("redis.host"),
+					err.Error(),
+				),
+			)
+			redisWarned = true
+		}
 	} else {
 		globals.Debug(fmt.Sprintf("[connection] connected to redis (host: %s)", viper.GetString("redis.host")))
 	}
