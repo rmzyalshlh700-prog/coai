@@ -1,12 +1,14 @@
 package middleware
 
 import (
+	"chat/connection"
 	"chat/utils"
 	"fmt"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
-	"strings"
 )
 
 type Limiter struct {
@@ -58,6 +60,13 @@ func GetPrefixMap[T comparable](s string, p map[string]T) *T {
 
 func ThrottleMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// when redis is not reachable (e.g. bare deployments without a redis
+		// instance), skip rate limiting instead of failing the request
+		if !connection.RedisAlive() {
+			c.Next()
+			return
+		}
+
 		ip := c.ClientIP()
 		path := c.Request.URL.Path
 		cache := utils.GetCacheFromContext(c)
